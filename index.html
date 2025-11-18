@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Deep Blue Games Hub</title>
+  <title>O&B Games</title>
 
   <!-- Comfortaa font -->
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;700&display=swap" rel="stylesheet"/>
 
   <style>
-    :root{
-      /* Palette */
+    /* --- VARIABLES --- */
+    :root {
       --blue-0:#0a0f2b;
       --blue-1:#0e1a47;
       --blue-2:#10235a;
@@ -19,783 +19,144 @@
       --accent:#67d1ff;
       --accent-2:#7fffd4;
       --text:#e8f0ff;
-
-      /* UI */
       --radius:16px;
       --radius-sm:10px;
-      --shadow: 0 20px 40px rgba(0,0,0,.35);
-      --shadow-soft: 0 8px 24px rgba(0,0,0,.25);
-      --glass: rgba(255,255,255,.06);
-      --glass-strong: rgba(255,255,255,.12);
-
-      /* Motion */
+      --shadow:0 20px 40px rgba(0,0,0,.35);
+      --shadow-soft:0 8px 24px rgba(0,0,0,.25);
+      --glass:rgba(255,255,255,.06);
+      --glass-strong:rgba(255,255,255,.12);
       --dur-fast:.25s;
       --dur:.45s;
       --dur-slow:.9s;
-      --ease: cubic-bezier(.22,.61,.36,1);
+      --ease:cubic-bezier(.22,.61,.36,1);
     }
 
-    html,body{
+    html,body {
       height:100%;
       margin:0;
       background: radial-gradient(1200px 800px at 20% 20%, var(--blue-4) 0%, var(--blue-2) 35%, var(--blue-1) 60%, var(--blue-0) 100%);
       color:var(--text);
-      font-family:'Comfortaa', system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
-      overflow:hidden; /* Let the main container scroll, keep bg fixed */
+      font-family:'Comfortaa', system-ui, sans-serif;
+      overflow:hidden;
     }
 
-    /* Responsive, interactive background layer */
-    .bg{
-      position:fixed;
-      inset:0;
-      z-index:-2;
-      pointer-events:none;
-      filter:saturate(105%) contrast(105%);
-    }
-    /* A subtle gradient overlay for depth */
-    .bg-gradient{
-      position:absolute;
-      inset:0;
-      background:
-        radial-gradient(1200px 900px at 10% 90%, rgba(103,209,255,.08), transparent 60%),
-        radial-gradient(1000px 700px at 90% 10%, rgba(127,255,212,.06), transparent 60%);
+    /* Background */
+    .bg { position:fixed; inset:0; z-index:-2; pointer-events:none; }
+    .bg-gradient { position:absolute; inset:0;
+      background: radial-gradient(1200px 900px at 10% 90%, rgba(103,209,255,.08), transparent 60%),
+                  radial-gradient(1000px 700px at 90% 10%, rgba(127,255,212,.06), transparent 60%);
       mix-blend-mode:screen;
-      z-index:1;
     }
-    /* Particle canvas sits below overlay */
-    canvas#particles{
-      position:absolute;
-      inset:0;
-      z-index:0;
-    }
+    canvas#particles { position:absolute; inset:0; }
 
-    /* Main scrollable app surface */
-    .app{
-      position:relative;
-      height:100%;
-      overflow:auto;
-      backdrop-filter: blur(6px);
-    }
+    /* App container */
+    .app { position:relative; height:100%; overflow:auto; backdrop-filter:blur(6px); }
 
     /* Header */
-    header{
-      position:sticky;
-      top:0;
-      z-index:5;
-      margin:24px auto 0;
-      max-width:1100px;
-      padding:18px 22px;
-      border-radius:var(--radius);
+    header {
+      position:sticky; top:0; z-index:5;
+      margin:24px auto 0; max-width:1100px;
+      padding:18px 22px; border-radius:var(--radius);
       background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
-      box-shadow: var(--shadow-soft);
+      box-shadow:var(--shadow-soft);
       border:1px solid rgba(255,255,255,.12);
-      display:flex;
-      align-items:center;
-      gap:14px;
-      transform:translateY(0);
-      animation: floatIn var(--dur-slow) var(--ease) both;
+      display:flex; align-items:center; gap:14px;
     }
-    header .logo{
-      width:44px;height:44px;border-radius:12px;
-      background: conic-gradient(from 120deg, var(--accent), var(--accent-2), var(--blue-4), var(--accent));
-      box-shadow: 0 8px 20px rgba(103,209,255,.25);
-      transform: rotate(0deg);
-      animation: spinSoft 14s linear infinite;
+    header .logo { width:44px;height:44px;border-radius:12px;
+      background:conic-gradient(from 120deg, var(--accent), var(--accent-2), var(--blue-4), var(--accent));
+      animation:spinSoft 14s linear infinite;
     }
-    header h1{
-      margin:0;
-      font-size:1.4rem;
-      letter-spacing:.6px;
-      font-weight:700;
-      text-shadow:0 2px 14px rgba(103,209,255,.25);
-    }
-    header .spacer{flex:1;}
-    header .actions{
-      display:flex; gap:10px; align-items:center;
-    }
+    header h1 { margin:0; font-size:1.4rem; font-weight:700; }
+    header .spacer { flex:1; }
+    header .actions { display:flex; gap:10px; }
 
     /* Controls */
-    .control{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      padding:10px 12px;
-      border-radius:var(--radius-sm);
-      background: var(--glass);
-      border:1px solid rgba(255,255,255,.14);
-      transition: background var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+    .control { display:flex; align-items:center; gap:10px;
+      padding:10px 12px; border-radius:var(--radius-sm);
+      background:var(--glass); border:1px solid rgba(255,255,255,.14);
     }
-    .control:focus-within{
-      background: var(--glass-strong);
-      transform: translateY(-1px);
-      box-shadow: 0 12px 30px rgba(0,0,0,.25);
-    }
-    .control input{
-      flex:1;
-      padding:10px 12px;
-      color:var(--text);
-      background:transparent;
-      border:0;
-      outline:none;
-      font-size:.98rem;
-    }
-    .control button{
-      padding:10px 14px;
-      border:0;
-      border-radius:12px;
-      color:#041224;
-      background: linear-gradient(180deg, var(--accent) 0%, #a0e7ff 100%);
-      box-shadow: 0 8px 18px rgba(103,209,255,.35);
-      font-weight:700;
-      transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), filter var(--dur-fast) var(--ease);
-      cursor:pointer;
-    }
-    .control button:hover{ transform: translateY(-2px) scale(1.02); }
-    .control button:active{ transform: translateY(0) scale(.98); box-shadow: 0 6px 14px rgba(103,209,255,.28); }
-
-    /* Content wrapper */
-    .content{
-      max-width:1100px;
-      margin:22px auto 60px;
-      padding:0 8px;
+    .control input { flex:1; padding:10px; background:transparent; border:0; color:var(--text); }
+    .control button { padding:10px 14px; border:0; border-radius:12px;
+      background:linear-gradient(180deg, var(--accent), #a0e7ff);
+      font-weight:700; cursor:pointer;
     }
 
     /* Grid */
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap:16px;
-    }
-    @media (max-width: 1200px){
-      .grid{ grid-template-columns: repeat(8, 1fr); }
-    }
-    @media (max-width: 860px){
-      .grid{ grid-template-columns: repeat(6, 1fr); }
-    }
-    @media (max-width: 640px){
-      .grid{ grid-template-columns: repeat(2, 1fr); }
-    }
+    .content { max-width:1100px; margin:22px auto 60px; }
+    .grid { display:grid; grid-template-columns:repeat(12,1fr); gap:16px; }
+    @media(max-width:860px){ .grid{ grid-template-columns:repeat(6,1fr);} }
+    @media(max-width:640px){ .grid{ grid-template-columns:repeat(2,1fr);} }
 
     /* Card */
-    .card{
-      grid-column: span 4;
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      border:1px solid rgba(255,255,255,.14);
-      border-radius:var(--radius);
-      box-shadow: var(--shadow-soft);
-      overflow:hidden;
-      position:relative;
-      display:flex;
-      flex-direction:column;
-      min-height:280px;
-      transform: translateZ(0);
-      transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease);
+    .card { grid-column:span 4; background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.14); border-radius:var(--radius);
+      box-shadow:var(--shadow-soft); display:flex; flex-direction:column;
     }
-    .card:hover{
-      transform: translateY(-3px);
-      box-shadow: 0 20px 40px rgba(0,0,0,.35);
-      border-color: rgba(255,255,255,.22);
+    .card header { display:flex; justify-content:space-between; align-items:center;
+      padding:10px; background:rgba(255,255,255,.08);
     }
-    .card header{
-      position:relative;
-      margin:0;
-      border-radius:0;
-      padding:10px 14px;
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
-      border-bottom:1px solid rgba(255,255,255,.12);
-      box-shadow:none;
-      display:flex; gap:10px; align-items:center;
+    .card .frame { flex:1; }
+    .card iframe { width:100%; height:100%; border:0; background:#081431; }
+
+    .tools { display:flex; gap:8px; }
+    .btn-icon { width:38px;height:38px; border-radius:12px; border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.08); display:grid; place-items:center; cursor:pointer;
     }
-    .card header .logo{
-      width:36px;height:36px;border-radius:10px;
-      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
-      animation: none;
-    }
-    .card header h2{
-      margin:0;
-      font-size:1.05rem;
-      letter-spacing:.3px;
-      font-weight:700;
-    }
-    .card .frame{
-      position:relative;
-      flex:1;
-      background: radial-gradient(500px 300px at 50% 50%, rgba(103,209,255,.06), rgba(255,255,255,0) 65%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-    }
-    .card iframe{
-      width:100%;
-      height:100%;
-      border:0;
-      background:#081431;
-      transform: scale(1) translateZ(0);
-      transition: transform var(--dur-slow) var(--ease), filter var(--dur-slow) var(--ease), box-shadow var(--dur) var(--ease);
-    }
-    .card:hover iframe{
-      transform: scale(1.01);
-      filter: saturate(110%);
-    }
-    .card .tools{
-      display:flex;
-      gap:8px;
-      position:absolute;
-      top:10px; right:10px;
-    }
-    .btn-icon{
-      width:38px;height:38px;border-radius:12px;border:1px solid rgba(255,255,255,.16);
-      background: rgba(255,255,255,.08);
-      display:grid; place-items:center;
-      cursor:pointer;
-      transition: transform var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
-    }
-    .btn-icon:hover{ transform: translateY(-2px); background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.24); }
-    .btn-icon svg{ width:20px;height:20px; fill:var(--text); opacity:.9; }
+    .btn-icon svg { width:20px;height:20px; fill:var(--text); }
 
     /* Empty state */
-    .empty{
-      grid-column: 1 / -1;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      padding:40px 20px;
-      color:#b9c7ff;
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border:1px dashed rgba(255,255,255,.18);
-      border-radius:var(--radius);
-      animation: floatIn var(--dur-slow) var(--ease) both;
+    .empty { grid-column:1/-1; text-align:center; padding:40px; color:#b9c7ff;
+      border:1px dashed rgba(255,255,255,.18); border-radius:var(--radius);
     }
 
     /* Footer */
-    footer{
-      max-width:1100px;
-      margin:20px auto 60px;
-      padding:16px 20px;
-      border-radius:var(--radius);
-      border:1px solid rgba(255,255,255,.12);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      box-shadow: var(--shadow-soft);
-      font-size:.92rem;
-    }
-
-    /* Animations */
-    @keyframes floatIn{
-      from{ opacity:0; transform: translateY(12px) scale(.98); }
-      to{ opacity:1; transform: translateY(0) scale(1); }
-    }
-    @keyframes spinSoft{
-      0%{ transform: rotate(0deg); }
-      100%{ transform: rotate(360deg); }
-    }
-    .pulse{
-      animation: pulse 3.5s var(--ease) infinite;
-    }
-    @keyframes pulse{
-      0%,100%{ box-shadow: 0 0 0 0 rgba(103,209,255,.0); }
-      50%{ box-shadow: 0 0 0 14px rgba(103,209,255,.08); }
+    footer { max-width:1100px; margin:20px auto 60px; padding:16px;
+      border-radius:var(--radius); background:rgba(255,255,255,.06);
     }
 
     /* Toast */
-    .toast{
-      position:fixed;
-      bottom:22px; left:50%;
-      transform: translateX(-50%) translateY(20px);
-      background: rgba(14,26,71,.85);
-      color:var(--text);
-      border:1px solid rgba(255,255,255,.16);
-      border-radius:14px;
-      padding:12px 16px;
-      box-shadow: var(--shadow);
-      opacity:0;
-      pointer-events:none;
-      transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
-      z-index:20;
-    }
-    .toast.show{
-      opacity:1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    /* Draggable hint */
-    .dragging{
-      cursor:grabbing;
-      opacity:.92;
-      transform: scale(.99);
-    }
-
-    /* Accessibility */
-    .sr-only{
-      position:absolute !important;
-      height:1px;width:1px;
-      overflow:hidden; clip:rect(1px,1px,1px,1px);
-      white-space:nowrap; border:0; padding:0; margin:-1px;
-    }
+    .toast { position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
+      background:rgba(14,26,71,.85); color:var(--text); border-radius:14px;
+      padding:12px 16px; opacity:0; transition:.4s; }
+    .toast.show { opacity:1; }
+    @keyframes spinSoft { from{transform:rotate(0);} to{transform:rotate(360deg);} }
   </style>
 </head>
 <body>
-  <!-- Interactive deep blue background -->
-  <div class="bg" aria-hidden="true">
-    <canvas id="particles"></canvas>
-    <div class="bg-gradient"></div>
-  </div>
+  <div class="bg"><canvas id="particles"></canvas><div class="bg-gradient"></div></div>
 
-  <div class="app" id="app">
-    <!-- Header -->
+  <div class="app">
     <header>
-      <div class="logo pulse" aria-hidden="true"></div>
+      <div class="logo"></div>
       <h1>Deep Blue Games Hub</h1>
       <div class="spacer"></div>
       <div class="actions">
-        <div class="control" aria-label="Add game by URL">
-          <input id="gameUrl" type="url" placeholder="Paste game URL (https://...)" autocomplete="off" inputmode="url" />
-          <button id="addBtn" title="Add game">Add game</button>
+        <div class="control">
+          <input id="gameUrl" type="url" placeholder="Paste game URL"/>
+          <button id="addBtn">Add game</button>
         </div>
-        <div class="control" aria-label="Layout and theme">
-          <button id="layoutBtn" title="Toggle layout">Layout</button>
-          <button id="clearBtn" title="Clear all">Clear</button>
+        <div class="control">
+          <button id="layoutBtn">Layout</button>
+          <button id="clearBtn">Clear</button>
         </div>
       </div>
     </header>
 
-    <!-- Content -->
     <main class="content">
-      <section aria-label="Games grid">
-        <div id="grid" class="grid">
-          <div id="emptyState" class="empty">
-            <div>
-              <h2 style="margin:0 0 8px">No games yet</h2>
-              <p style="margin:0">Paste a URL and press Add game. Supports itch.io, JS demos, web emulators, or any embeddable site.</p>
-            </div>
-          </div>
+      <div id="grid" class="grid">
+        <div id="emptyState" class="empty">
+          <h2>No games yet</h2>
+          <p>Paste a URL and press Add game. Supports itch.io, Google Sites, JS demos, etc.</p>
         </div>
-      </section>
+      </div>
     </main>
 
-    <!-- Footer -->
-    <footer>
-      <p><strong>Tip:</strong> Drag cards to reorder. Your games are saved to your browser. Background responds to your cursor and music-like motion.</p>
-    </footer>
+    <footer><p>Tip: Drag cards to reorder. Games are saved locally.</p></footer>
   </div>
 
-  <!-- Toast -->
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="toast" class="toast"></div>
 
   <script>
-    /* Utility: tiny helper functions */
-    const qs = sel => document.querySelector(sel);
-    const qsa = sel => Array.from(document.querySelectorAll(sel));
-
-    /* Persistent store */
-    const Store = {
-      key: 'deep-blue-games-v1',
-      load(){
-        try{
-          const raw = localStorage.getItem(this.key);
-          return raw ? JSON.parse(raw) : [];
-        }catch(e){ return []; }
-      },
-      save(list){
-        try{ localStorage.setItem(this.key, JSON.stringify(list)); }catch(e){}
-      }
-    };
-
-    /* Toast */
-    function toast(msg, ms=1800){
-      const el = qs('#toast');
-      el.textContent = msg;
-      el.classList.add('show');
-      setTimeout(()=> el.classList.remove('show'), ms);
-    }
-
-    /* URL sanitization and embed detection */
-    function normalizeUrl(u){
-      try{
-        const url = new URL(u.trim());
-        // Force https for iframes where possible
-        if(url.protocol !== 'https:') url.protocol = 'https:';
-        return url.toString();
-      }catch(e){ return null; }
-    }
-
-    function deriveTitle(u){
-      try{
-        const {hostname, pathname} = new URL(u);
-        const host = hostname.replace('www.','');
-        const path = pathname.replace(/\/+/g,'/').replace(/^\/|\/$/g,'');
-        const base = path ? path.split('/').slice(-1)[0] : host;
-        return decodeURIComponent(base || host).replace(/[-_]+/g,' ').slice(0,64);
-      }catch(e){ return 'Game'; }
-    }
-
-    function computeEmbedSrc(u){
-      // For common platforms, adjust to embeddable paths
-      // itch.io: https://username.itch.io/game -> append /embed
-      try{
-        const url = new URL(u);
-        if(url.hostname.endsWith('.itch.io') || url.hostname === 'itch.io'){
-          // If already embed path, keep; else append /embed
-          if(!url.pathname.endsWith('/embed')) url.pathname = url.pathname.replace(/\/+$/,'') + '/embed';
-          return url.toString();
-        }
-        // If it looks like a direct HTML demo (GitHub pages, Netlify, etc.), just use it.
-        return u;
-      }catch(e){ return u; }
-    }
-
-    /* DOM builders */
-    function icon(name){
-      const NS='http://www.w3.org/2000/svg';
-      const svg=document.createElementNS(NS,'svg');
-      svg.setAttribute('viewBox','0 0 24 24');
-      const p=document.createElementNS(NS,'path');
-      const paths={
-        close:'M6.7 6.7a1 1 0 0 1 1.4 0L12 10.6l3.9-3.9a1 1 0 1 1 1.4 1.4L13.4 12l3.9 3.9a1 1 0 0 1-1.4 1.4L12 13.4l-3.9 3.9a1 1 0 0 1-1.4-1.4L10.6 12 6.7 8.1a1 1 0 0 1 0-1.4Z',
-        expand:'M4 14a2 2 0 0 1 2-2h2v2H6v2H4v-2Zm10-8h2a2 2 0 0 1 2 2v2h-2V8h-2V6Zm-2 12h2v2h2v2h-2a2 2 0 0 1-2-2v-2Zm-8-8H2V6h2a2 2 0 0 1 2 2v2H6Z',
-        drag:'M10 4h4v4h-4V4Zm6 0h4v4h-4V4ZM4 4h4v4H4V4Zm6 6h4v4h-4v-4Zm6 6h4v4h-4v-4ZM4 16h4v4H4v-4Z',
-        open:'M5 4h8a1 1 0 0 1 1 1v2h-2V6H6v12h6v-1h2v2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Zm12.3 6.3a1 1 0 0 0-1.4 1.4l1.3 1.3H12a1 1 0 1 0 0 2h5.2l-1.3 1.3a1 1 0 0 0 1.4 1.4l3.2-3.2a1 1 0 0 0 0-1.4l-3.2-3.2Z'
-      };
-      p.setAttribute('d', paths[name] || paths.drag);
-      svg.appendChild(p);
-      return svg;
-    }
-
-    function cardTemplate({id, title, src}){
-      const card=document.createElement('article');
-      card.className='card';
-      card.dataset.id=id;
-
-      const head=document.createElement('header');
-      const logo=document.createElement('div');
-      logo.className='logo';
-      const h2=document.createElement('h2');
-      h2.textContent=title || 'Game';
-      head.appendChild(logo); head.appendChild(h2);
-
-      const tools=document.createElement('div');
-      tools.className='tools';
-      const btnOpen=document.createElement('button');
-      btnOpen.className='btn-icon';
-      btnOpen.title='Open in new tab';
-      btnOpen.appendChild(icon('open'));
-      btnOpen.addEventListener('click', ()=> window.open(src, '_blank', 'noopener'));
-
-      const btnExpand=document.createElement('button');
-      btnExpand.className='btn-icon';
-      btnExpand.title='Toggle fullscreen';
-      btnExpand.appendChild(icon('expand'));
-      btnExpand.addEventListener('click', ()=> toggleFullscreen(card));
-
-      const btnRemove=document.createElement('button');
-      btnRemove.className='btn-icon';
-      btnRemove.title='Remove';
-      btnRemove.appendChild(icon('close'));
-      btnRemove.addEventListener('click', ()=> removeCard(id));
-
-      tools.append(btnOpen, btnExpand, btnRemove);
-      head.appendChild(tools);
-
-      const frame=document.createElement('div');
-      frame.className='frame';
-      const iframe=document.createElement('iframe');
-      iframe.loading='lazy';
-      iframe.referrerPolicy='no-referrer-when-downgrade';
-      iframe.src=computeEmbedSrc(src);
-      frame.appendChild(iframe);
-
-      card.appendChild(head);
-      card.appendChild(frame);
-      return card;
-    }
-
-    /* Fullscreen */
-    let fullscreenEl=null;
-    function toggleFullscreen(card){
-      if(fullscreenEl && fullscreenEl!==card) exitFullscreen();
-      const iframe=card.querySelector('iframe');
-      if(!document.fullscreenElement){
-        card.requestFullscreen?.();
-        fullscreenEl=card;
-        iframe.style.boxShadow='0 0 0 2px rgba(103,209,255,.35)';
-        iframe.style.transform='scale(1.02)';
-      }else{
-        exitFullscreen();
-      }
-    }
-    function exitFullscreen(){
-      document.exitFullscreen?.();
-      if(fullscreenEl){
-        const iframe=fullscreenEl.querySelector('iframe');
-        if(iframe){
-          iframe.style.boxShadow='';
-          iframe.style.transform='';
-        }
-      }
-      fullscreenEl=null;
-    }
-    document.addEventListener('fullscreenchange', ()=>{
-      if(!document.fullscreenElement) exitFullscreen();
-    });
-
-    /* Grid management */
-    let items = Store.load(); // [{id, title, src}]
-    const grid = qs('#grid');
-    const empty = qs('#emptyState');
-
-    function render(){
-      grid.innerHTML='';
-      if(!items.length){
-        grid.appendChild(empty);
-      }else{
-        items.forEach(item=>{
-          const card=cardTemplate(item);
-          grid.appendChild(card);
-        });
-      }
-    }
-
-    function addItem(url){
-      const clean = normalizeUrl(url);
-      if(!clean){ toast('Invalid URL'); return; }
-      const item = {
-        id: crypto.randomUUID?.() || String(Date.now())+Math.random().toString(16).slice(2),
-        title: deriveTitle(clean),
-        src: clean
-      };
-      items.unshift(item);
-      Store.save(items);
-      render();
-      toast('Game added');
-      qs('#gameUrl').value='';
-    }
-
-    function removeCard(id){
-      items = items.filter(x=> x.id!==id);
-      Store.save(items);
-      render();
-      toast('Removed');
-    }
-
-    /* Drag to reorder */
-    let dragState = null;
-    function enableDragging(){
-      let originIndex=-1, ghost=null;
-
-      grid.addEventListener('pointerdown', (e)=>{
-        const card = e.target.closest('.card');
-        if(!card) return;
-        card.setPointerCapture?.(e.pointerId);
-        dragState = { card, startX:e.clientX, startY:e.clientY };
-        originIndex = items.findIndex(x=> x.id===card.dataset.id);
-        card.classList.add('dragging');
-        // Create a ghost height placeholder
-        ghost = document.createElement('div');
-        ghost.style.height = card.offsetHeight+'px';
-        ghost.style.gridColumn='span 4';
-        ghost.style.border='1px dashed rgba(255,255,255,.14)';
-        ghost.style.borderRadius='var(--radius)';
-        grid.insertBefore(ghost, card.nextSibling);
-      });
-
-      grid.addEventListener('pointermove', (e)=>{
-        if(!dragState) return;
-        const {card, startX, startY} = dragState;
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
-        card.style.transform = `translate(${dx}px, ${dy}px) scale(.995)`;
-        // Find nearest insert position
-        const cards = qsa('.card').filter(c=> c!==card);
-        let nearest = null, minDist = Infinity;
-        cards.forEach(c=>{
-          const r = c.getBoundingClientRect();
-          const cx = r.left + r.width/2;
-          const cy = r.top + r.height/2;
-          const d = Math.hypot(e.clientX - cx, e.clientY - cy);
-          if(d < minDist){ minDist = d; nearest = c; }
-        });
-        if(nearest && ghost){
-          grid.insertBefore(ghost, (e.clientY < nearest.getBoundingClientRect().top + nearest.offsetHeight/2) ? nearest : nearest.nextSibling);
-        }
-      });
-
-      const release = ()=>{
-        if(!dragState) return;
-        const {card} = dragState;
-        card.classList.remove('dragging');
-        card.style.transform = '';
-        if(ghost){
-          grid.insertBefore(card, ghost);
-          ghost.remove();
-          ghost=null;
-        }
-        const newOrder = qsa('.card').map(c=> c.dataset.id);
-        items.sort((a,b)=> newOrder.indexOf(a.id) - newOrder.indexOf(b.id));
-        Store.save(items);
-        dragState=null;
-      };
-
-      grid.addEventListener('pointerup', release);
-      grid.addEventListener('pointercancel', release);
-      grid.addEventListener('mouseleave', release);
-    }
-
-    /* Layout toggle: 3-up / 2-up / 1-up */
-    let layoutMode = 3;
-    function applyLayout(){
-      const span = layoutMode===3 ? 4 : layoutMode===2 ? 6 : 12;
-      qsa('.card').forEach(c=> c.style.gridColumn = `span ${span}`);
-      toast(layoutMode===3?'Grid 3-up':'Grid '+(layoutMode===2?'2-up':'Full-width'));
-    }
-
-    /* Controls wiring */
-    function wireControls(){
-      qs('#addBtn').addEventListener('click', ()=>{
-        addItem(qs('#gameUrl').value);
-      });
-      qs('#gameUrl').addEventListener('keydown', e=>{
-        if(e.key==='Enter') addItem(e.target.value);
-      });
-      qs('#clearBtn').addEventListener('click', ()=>{
-        if(confirm('Clear all games?')){
-          items = [];
-          Store.save(items);
-          render();
-          toast('Cleared');
-        }
-      });
-      qs('#layoutBtn').addEventListener('click', ()=>{
-        layoutMode = layoutMode===3 ? 2 : layoutMode===2 ? 1 : 3;
-        applyLayout();
-      });
-    }
-
-    /* Responsive, reactive background: particles + parallax */
-    function initParticles(){
-      const canvas = qs('#particles');
-      const ctx = canvas.getContext('2d');
-      let W=0,H=0, DPR = Math.min(2, window.devicePixelRatio||1);
-      let particles = [];
-      let mouse = { x: -9999, y: -9999, vx:0, vy:0 };
-
-      function resize(){
-        W = canvas.clientWidth = window.innerWidth;
-        H = canvas.clientHeight = window.innerHeight;
-        canvas.width = W * DPR; canvas.height = H * DPR;
-        ctx.setTransform(DPR,0,0,DPR,0,0);
-      }
-      window.addEventListener('resize', resize);
-      resize();
-
-      const COUNT = Math.floor((W*H)/22000); // density-based
-      for(let i=0;i<COUNT;i++){
-        particles.push({
-          x: Math.random()*W,
-          y: Math.random()*H,
-          r: 1.2 + Math.random()*2.2,
-          a: .25 + Math.random()*.65,
-          vx: -0.15 + Math.random()*0.3,
-          vy: -0.15 + Math.random()*0.3
-        });
-      }
-
-      function step(){
-        ctx.clearRect(0,0,W,H);
-
-        // Gentle gradient wash
-        const g = ctx.createRadialGradient(W*.15,H*.85, 80, W*.5,H*.4, Math.max(W,H));
-        g.addColorStop(0,'rgba(103,209,255,.06)');
-        g.addColorStop(1,'rgba(103,209,255,0)');
-        ctx.fillStyle = g;
-        ctx.fillRect(0,0,W,H);
-
-        // Particle motion with mouse influence
-        for(const p of particles){
-          const dx = mouse.x - p.x;
-          const dy = mouse.y - p.y;
-          const d2 = dx*dx + dy*dy;
-          const force = d2>0 ? Math.min(1.25, 9000/d2) : 0;
-
-          p.vx += (dx>0? 0.0004 : -0.0004) * force;
-          p.vy += (dy>0? 0.0004 : -0.0004) * force;
-
-          p.x += p.vx;
-          p.y += p.vy;
-
-          // wrap
-          if(p.x<-10) p.x=W+10;
-          if(p.x>W+10) p.x=-10;
-          if(p.y<-10) p.y=H+10;
-          if(p.y>H+10) p.y=-10;
-
-          // draw
-          ctx.globalAlpha = p.a;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-          ctx.fillStyle = 'rgba(127,255,212,.55)';
-          ctx.fill();
-
-          // twinkle line to mouse occasionally
-          if(force>.9 && Math.random()<.02){
-            ctx.globalAlpha = .08;
-            ctx.strokeStyle = 'rgba(103,209,255,.8)';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(mouse.x, mouse.y);
-            ctx.stroke();
-          }
-        }
-        requestAnimationFrame(step);
-      }
-      step();
-
-      window.addEventListener('pointermove',(e)=>{
-        const rect = canvas.getBoundingClientRect();
-        const nx = e.clientX - rect.left;
-        const ny = e.clientY - rect.top;
-        mouse.vx = nx - mouse.x;
-        mouse.vy = ny - mouse.y;
-        mouse.x = nx; mouse.y = ny;
-      });
-      window.addEventListener('pointerleave',()=>{
-        mouse.x = -9999; mouse.y = -9999;
-      });
-    }
-
-    /* Entrance effects based on scroll */
-    function initScrollFX(){
-      const obs = new IntersectionObserver((entries)=>{
-        for(const entry of entries){
-          if(entry.isIntersecting){
-            entry.target.style.animation = 'floatIn var(--dur-slow) var(--ease) both';
-          }
-        }
-      }, {threshold:.15});
-      qsa('.card, .empty').forEach(el=> obs.observe(el));
-    }
-
-    /* Init */
-    function init(){
-      render();
-      wireControls();
-      enableDragging();
-      initParticles();
-      applyLayout();
-      initScrollFX();
-
-      // Demo entries if first run
-      if(!items.length){
-        const demos = [
-          'https://phoboslab.org/xbones/', // canvas demo
-          'https://playcanvas.com/supercharge', // 3D demo
-          'https://killedbyapixel.github.io/TinyTennis/', // game demo
-        ];
-        demos.forEach(u=> addItem(u));
-      }
-    }
-    document.addEventListener('DOMContentLoaded', init);
-  </script>
-</body>
-</html>
+    const qs=sel=>document.querySelector(sel), qsa=sel=>Array.from(document.querySelectorAll(sel));
+    const Store={key:'deep-blue-games-v1',load(){try{return JSON.parse(localStorage.getItem(this.key))||[]}catch(e){return[]}},save(l){localStorage.setItem(this.key,JSON.stringify(l))}};
+    function toast(msg){const el=qs('#toast');el.textContent=msg;
